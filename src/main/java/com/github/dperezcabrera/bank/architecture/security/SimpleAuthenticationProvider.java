@@ -1,6 +1,8 @@
 package com.github.dperezcabrera.bank.architecture.security;
 
+import com.github.dperezcabrera.bank.architecture.auth.dtos.Features;
 import com.github.dperezcabrera.bank.architecture.auth.repositories.UserRepository;
+import com.github.dperezcabrera.bank.architecture.auth.services.FeatureService;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -23,6 +25,7 @@ public class SimpleAuthenticationProvider implements AuthenticationProvider {
 	private DataSource dataSource;
 	private UserRepository userRepository;
 	private Environment env;
+	private FeatureService featureService;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -39,9 +42,10 @@ public class SimpleAuthenticationProvider implements AuthenticationProvider {
 	private boolean authenticate(@NonNull String username, @NonNull String password) {
 		if ("admin".equalsIgnoreCase(username)) {
 			return password.equals(env.getProperty("admin.password"));
+		} else if (featureService.isActive(Features.SQL_INJECTION)) {
+			return insecureAuth(username, password);
 		} else {
-			boolean secure = true;
-			return (secure) ? secureAuth(username, password) : insecureAuth(username, password);
+			return secureAuth(username, password);
 		}
 	}
 
