@@ -4,6 +4,6 @@ public enum Features {
     SQL_INJECTION,
     XSS,
     TRANSFER_VALIDATION,
-	REGISTER_LEAK,
+    REGISTER_LEAK,
     DATA_LEAK
 }

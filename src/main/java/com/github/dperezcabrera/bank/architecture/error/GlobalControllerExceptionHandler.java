@@ -15,21 +15,21 @@ public class GlobalControllerExceptionHandler {
     @ExceptionHandler(value = {DeniedPermissionException.class})
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public MessageDto deniedPermissionException(DeniedPermissionException ex) {
-        log.error("deniedPermissionException ",ex);
-        return new MessageDto("Denied permission");
+        log.error("deniedPermissionException ", ex);
+        return MessageDto.forbidden("Denied permission");
     }
 
     @ExceptionHandler(value = {ConstraintViolationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public MessageDto constraintViolationException(ConstraintViolationException ex) {
-        log.error("constraintViolationException ",ex);
-        return new MessageDto("Bad request");
+        log.error("constraintViolationException ", ex);
+        return MessageDto.error("Bad request");
     }
 
     @ExceptionHandler(value = {Exception.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public MessageDto internalServerError(Exception ex) {
-        log.error("internalServerError ",ex);
-        return new MessageDto("Internal error");
+        log.error("internalServerError ", ex);
+        return MessageDto.error("Internal error");
     }
 }

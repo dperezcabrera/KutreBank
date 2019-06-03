@@ -29,21 +29,21 @@ public class Movement implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-  
+
     @Column(nullable = false)
-	private long amount;
-	
-	@CreatedDate
-	private LocalDateTime date;
+    private long amount;
+
+    @CreatedDate
+    private LocalDateTime date;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private User origin;
-	
-	@ManyToOne(fetch = FetchType.LAZY)
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private User target;
 
-	@Column(length = 512)
+    @Column(length = 512)
     private String description;
 }

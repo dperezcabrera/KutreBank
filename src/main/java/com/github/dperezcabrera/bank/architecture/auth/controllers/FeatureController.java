@@ -16,24 +16,24 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class FeatureController {
 
-	private FeatureService featureService;
+    private FeatureService featureService;
 
-	@GetMapping("/all")
-	@PreAuthorize("@roleChecker.isAdmin()")
-	public ResponseEntity<List<String>> getAll() {
-		return ResponseEntity.ok(featureService.getAllFeatures());
-	}
+    @GetMapping("/all")
+    @PreAuthorize("@roleChecker.isAdmin()")
+    public ResponseEntity<List<String>> getAll() {
+        return ResponseEntity.ok(featureService.getAllFeatures());
+    }
 
-	@GetMapping("/actives")
-	@PreAuthorize("@roleChecker.isAdmin()")
-	public ResponseEntity<List<String>> getActives() {
-		return ResponseEntity.ok(featureService.getActiveFeatures());
-	}
+    @GetMapping("/actives")
+    @PreAuthorize("@roleChecker.isAdmin()")
+    public ResponseEntity<List<String>> getActives() {
+        return ResponseEntity.ok(featureService.getActiveFeatures());
+    }
 
-	@PutMapping("/actives")
-	@PreAuthorize("@roleChecker.isAdmin()")
-	public ResponseEntity<Void> setActives(FeaturesDto features) {
-		featureService.setActiveFeatures(features.getFeatures());
-		return ResponseEntity.ok().body(null);
-	}
+    @PutMapping("/actives")
+    @PreAuthorize("@roleChecker.isAdmin()")
+    public ResponseEntity<Void> setActives(FeaturesDto features) {
+        featureService.setActiveFeatures(features.getFeatures());
+        return ResponseEntity.ok().body(null);
+    }
 }

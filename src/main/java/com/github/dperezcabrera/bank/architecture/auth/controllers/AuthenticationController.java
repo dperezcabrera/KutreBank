@@ -5,6 +5,7 @@ import com.github.dperezcabrera.bank.architecture.auth.dtos.SignUpDto;
 import com.github.dperezcabrera.bank.architecture.auth.dtos.UserDto;
 import com.github.dperezcabrera.bank.architecture.auth.services.UserService;
 import com.github.dperezcabrera.bank.architecture.common.MessageDto;
+import com.github.dperezcabrera.bank.architecture.common.MessageType;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -28,56 +29,55 @@ import org.springframework.security.core.context.SecurityContextHolder;
 @AllArgsConstructor
 public class AuthenticationController {
 
-	private static final ResponseEntity<?> FORBIDDEN_RESPONSE = ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
-	
-	private final AuthenticationManager authenticationManager;
+    private static final ResponseEntity<?> FORBIDDEN_RESPONSE = ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
 
-	private final SessionRegistry sessionRegistry;
+    private final AuthenticationManager authenticationManager;
 
-	private final UserService userService;
+    private final SessionRegistry sessionRegistry;
 
-	private final AuditorAware<String> auditorAware;
+    private final UserService userService;
 
-	private static <T> ResponseEntity<T> forbidden() {
-		return (ResponseEntity<T>) FORBIDDEN_RESPONSE;
-	}
+    private final AuditorAware<String> auditorAware;
 
-	@GetMapping("/auth/login")
-	public ResponseEntity<UserDto> login() {
-		return auditorAware.getCurrentAuditor()
-				.map(username -> userService.getUser(username)
-				.map(ResponseEntity::ok)
-				.orElseGet(AuthenticationController::forbidden))
-				.orElseGet(AuthenticationController::forbidden);
-	}
+    private static <T> ResponseEntity<T> forbidden() {
+        return (ResponseEntity<T>) FORBIDDEN_RESPONSE;
+    }
 
-	@PostMapping("/auth/login")
-	public ResponseEntity<UserDto> login(HttpServletRequest request, @RequestBody CredentialsDto credentialsDto) {
-		UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(credentialsDto.getUsername(), credentialsDto.getPassword());
-		try {
-			return userService.getUser(credentialsDto.getUsername()).map(userDto -> {
-				Authentication auth = authenticationManager.authenticate(token);
-				SecurityContextHolder.getContext().setAuthentication(auth);
-				sessionRegistry.registerNewSession(request.getSession().getId(), auth.getPrincipal());
-				return ResponseEntity.ok(userDto);
-			}).orElseGet(AuthenticationController::forbidden);
-		} catch (BadCredentialsException ex) {
-			log.error("Bad credentials error", ex);
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
-		}
-	}
+    @GetMapping("/auth/login")
+    public ResponseEntity<UserDto> login() {
+        return auditorAware.getCurrentAuditor()
+                .map(username -> userService.getUser(username)
+                .map(ResponseEntity::ok)
+                .orElseGet(AuthenticationController::forbidden))
+                .orElseGet(AuthenticationController::forbidden);
+    }
 
-	@PostMapping("/auth/signup")
-	public ResponseEntity<MessageDto> signUp(@RequestBody SignUpDto signUpDto) {
-		try {
-			userService.signUp(signUpDto);
-			return ResponseEntity.ok(new MessageDto("El usuario ha sido registrado correctamente"));
-		} catch (IllegalArgumentException ex) {
-			log.error("No se ha podido registrar la peticion: " + signUpDto, ex);
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new MessageDto("No se ha podido registrar el usuario: " + ex.getMessage()));
-		} catch (Exception ex) {
-			log.error("No se ha podido registrar la peticion: " + signUpDto, ex);
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new MessageDto("No se ha podido registrar el usuario"));
-		}
-	}
+    @PostMapping("/auth/login")
+    public ResponseEntity<UserDto> login(HttpServletRequest request, @RequestBody CredentialsDto credentialsDto) {
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(credentialsDto.getUsername(), credentialsDto.getPassword());
+        try {
+            return userService.getUser(credentialsDto.getUsername()).map(userDto -> {
+                Authentication auth = authenticationManager.authenticate(token);
+                SecurityContextHolder.getContext().setAuthentication(auth);
+                sessionRegistry.registerNewSession(request.getSession().getId(), auth.getPrincipal());
+                return ResponseEntity.ok(userDto);
+            }).orElseGet(AuthenticationController::forbidden);
+        } catch (BadCredentialsException ex) {
+            log.error("Bad credentials error", ex);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+    }
+
+    @PostMapping("/auth/signup")
+    public ResponseEntity<MessageDto> signUp(@RequestBody SignUpDto signUpDto) {
+        try {
+            return userService.signUp(signUpDto).toResponse();
+        } catch (IllegalArgumentException ex) {
+            log.error("No se ha podido registrar la peticion: " + signUpDto, ex);
+            return MessageDto.forbidden("No se ha podido registrar el usuario: " + ex.getMessage()).toResponse();
+        } catch (Exception ex) {
+            log.error("No se ha podido registrar la peticion: " + signUpDto, ex);
+            return MessageDto.forbidden("No se ha podido registrar el usuario").toResponse();
+        }
+    }
 }
