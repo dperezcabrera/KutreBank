@@ -1,5 +1,6 @@
 package com.github.dperezcabrera.bank.architecture.auth.services;
 
+import com.github.dperezcabrera.bank.architecture.auth.dtos.ChangePasswordDto;
 import com.github.dperezcabrera.bank.architecture.auth.dtos.MovementDto;
 import com.github.dperezcabrera.bank.architecture.auth.dtos.SignUpDto;
 import com.github.dperezcabrera.bank.architecture.auth.dtos.TransferDto;
@@ -52,6 +53,18 @@ public class UserService {
 				.map(u -> movementRepository.findByUserId(u.getId()).stream()
 				.map(movementMapper::map)
 				.collect(Collectors.toList()));
+	}
+	
+	@Transactional
+	public MessageDto changePassword(String username, ChangePasswordDto changePasswordDto){
+		User origin = userRepository.findByUsername(username).get();
+		if (origin.getPassword().equals(changePasswordDto.getPassword())){
+			origin.setPassword(changePasswordDto.getNewPassword());
+			userRepository.save(origin);
+			return MessageDto.info("El password ha sido cambiado correctamente");
+		} else {
+			return MessageDto.forbidden("El password anteriror no coincide");
+		}
 	}
 
 	@Transactional

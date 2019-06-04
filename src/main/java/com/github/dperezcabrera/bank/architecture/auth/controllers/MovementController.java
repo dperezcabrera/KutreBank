@@ -39,7 +39,7 @@ public class MovementController {
 	
 	@GetMapping("/transfer")
 	public ResponseEntity<MessageDto> getTransfer(TransferDto transferDto){
-		if (featureService.isActive(Features.WRONG_HTTP_METHOD)){
+		if (featureService.isActive(Features.MOVEMENT_WRONG_HTTP_METHOD)){
 			return postTransfer(transferDto);
 		}
 		return MessageDto.forbidden("Metodo denegado").toResponse();
