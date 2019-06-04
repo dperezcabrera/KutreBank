@@ -2,6 +2,7 @@ package com.github.dperezcabrera.bank.architecture.auth.services;
 
 import com.github.dperezcabrera.bank.architecture.auth.dtos.MovementDto;
 import com.github.dperezcabrera.bank.architecture.auth.dtos.SignUpDto;
+import com.github.dperezcabrera.bank.architecture.auth.dtos.TransferDto;
 import com.github.dperezcabrera.bank.architecture.auth.dtos.UserDto;
 import com.github.dperezcabrera.bank.architecture.auth.dtos.UserPasswordDto;
 import com.github.dperezcabrera.bank.architecture.auth.entities.Movement;
@@ -54,6 +55,31 @@ public class UserService {
 	}
 
 	@Transactional
+	public MessageDto transfer(String originUsername, TransferDto transferDto){
+		User origin = userRepository.findByUsername(originUsername).get();
+		if (origin.isLocked()) {
+			return MessageDto.forbidden("El usuario '"+origin.getUsername()+"' esta bloqueado");
+		}
+		if (origin.getAmount() - transferDto.getAmount() < 0){
+			return MessageDto.forbidden("El usuario '"+origin.getUsername()+"' no cuenta con suficientes fondos");
+		}
+		User target = userRepository.getOne(transferDto.getTargetId());
+		if (target.isLocked()) {
+			return MessageDto.forbidden("El usuario '"+target.getUsername()+"' esta bloqueado");
+		}
+		if (target.getAmount() + transferDto.getAmount() < 0){
+			return MessageDto.forbidden("El usuario '"+target.getUsername()+"' esta en estado inconsistente");
+		}
+		origin.setAmount(origin.getAmount()-transferDto.getAmount());
+		target.setAmount(target.getAmount()+transferDto.getAmount());
+		Movement m = new Movement(null, transferDto.getAmount(), LocalDateTime.now(), origin, target, transferDto.getDescription());
+		movementRepository.save(m);
+		userRepository.save(origin);
+		userRepository.save(target);
+		return MessageDto.info("La transferencia ha sido realizada");
+	}
+	
+	@Transactional
 	public Optional<UserDto> setUserLock(long userId, boolean lock) {
 		return userRepository.findById(userId).map(u -> {
 			u.setLocked(lock);
@@ -64,6 +90,7 @@ public class UserService {
 
 	@Transactional
 	public MessageDto signUp(SignUpDto signUpDto) {
+		// TODO: Validation
 		String username = signUpDto.getUsername().toLowerCase();
 		if (userRepository.findByUsername(username).isPresent()) {
 			return MessageDto.error("El ususario '" + signUpDto.getUsername() + "' ya estaba dado de alta.");

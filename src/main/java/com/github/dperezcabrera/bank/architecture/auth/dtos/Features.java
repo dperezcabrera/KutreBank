@@ -4,5 +4,6 @@ public enum Features {
     SQL_INJECTION,
     XSS,
     TRANSFER_BUG,
+	WRONG_HTTP_METHOD,
     DATA_LEAK
 }

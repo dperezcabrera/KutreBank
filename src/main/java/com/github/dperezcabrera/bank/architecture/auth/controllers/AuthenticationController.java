@@ -5,7 +5,6 @@ import com.github.dperezcabrera.bank.architecture.auth.dtos.SignUpDto;
 import com.github.dperezcabrera.bank.architecture.auth.dtos.UserDto;
 import com.github.dperezcabrera.bank.architecture.auth.services.UserService;
 import com.github.dperezcabrera.bank.architecture.common.MessageDto;
-import com.github.dperezcabrera.bank.architecture.common.MessageType;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

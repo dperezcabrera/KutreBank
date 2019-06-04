@@ -2,7 +2,6 @@ package com.github.dperezcabrera.bank;
 
 import com.github.dperezcabrera.bank.architecture.auth.dtos.SignUpDto;
 import com.github.dperezcabrera.bank.architecture.auth.entities.Code;
-import com.github.dperezcabrera.bank.architecture.auth.entities.Movement;
 import com.github.dperezcabrera.bank.architecture.auth.entities.User;
 import com.github.dperezcabrera.bank.architecture.auth.repositories.CodeRepository;
 import com.github.dperezcabrera.bank.architecture.auth.repositories.UserRepository;
@@ -19,7 +18,6 @@ import lombok.AllArgsConstructor;
 public class Initializer implements CommandLineRunner {
 
     private UserService userService;
-	
     private UserRepository userRepository;
     private CodeRepository codeRepository;
 
