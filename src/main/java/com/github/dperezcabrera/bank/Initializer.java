@@ -25,19 +25,5 @@ public class Initializer implements CommandLineRunner {
     @Transactional
     public void run(String... strings) throws Exception {
         userRepository.save(new User(0L, "admin", "***********", 0, false));
-//        userRepository.save(new User(null, "alice", "1", 0));
-//        userRepository.save(new User(null, "bob", "2", 0));
-        codeRepository.save(new Code("1", null, 3000));
-        codeRepository.save(new Code("2", null, 3000));
-        codeRepository.save(new Code("3", null, 3000));
-        codeRepository.save(new Code("4", null, 3000));
-        codeRepository.save(new Code("5", null, 3000));
-        
-        
-        userService.signUp(new SignUpDto("alice", "1", "1"));
-        log.info("\"alice\" -> {}", userService.getUser("alice").get());
-		userService.getMovements("alice").ifPresent(l -> l.stream().forEach(m -> {
-			log.info("{} - {}(cc {}) -> {}(cc {}): {}€ - {}", m.getDate(), m.getOriginName(), m.getOriginId(), m.getTargetName(), m.getTargetId(), m.getAmount(), m.getDescription());
-		}));
     }
 }
