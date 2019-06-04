@@ -17,20 +17,20 @@ public class FeatureService {
 
 	private Set<String> allFeatures = Arrays.stream(Features.values()).map(Features::name).collect(Collectors.toSet());
 	private Set<String> activeFeatures = new HashSet<>();
-	
+
 	public List<String> getAllFeatures() {
 		return new ArrayList<>(allFeatures);
 	}
-	
-	public List<String> getActiveFeatures() {
+
+	public synchronized List<String> getActiveFeatures() {
 		return new ArrayList<>(activeFeatures);
 	}
-	
-	public void setActiveFeatures(@NonNull List<String> activeFeatures) {
+
+	public synchronized void setActiveFeatures(@NonNull List<String> activeFeatures) {
 		this.activeFeatures = activeFeatures.stream().filter(allFeatures::contains).collect(Collectors.toSet());
 	}
-	
-	public boolean isActive(@NonNull Features feature){
+
+	public synchronized boolean isActive(@NonNull Features feature) {
 		return activeFeatures.contains(feature.name());
 	}
 }

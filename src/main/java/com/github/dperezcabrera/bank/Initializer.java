@@ -2,6 +2,7 @@ package com.github.dperezcabrera.bank;
 
 import com.github.dperezcabrera.bank.architecture.auth.dtos.SignUpDto;
 import com.github.dperezcabrera.bank.architecture.auth.entities.Code;
+import com.github.dperezcabrera.bank.architecture.auth.entities.Movement;
 import com.github.dperezcabrera.bank.architecture.auth.entities.User;
 import com.github.dperezcabrera.bank.architecture.auth.repositories.CodeRepository;
 import com.github.dperezcabrera.bank.architecture.auth.repositories.UserRepository;
@@ -18,13 +19,14 @@ import lombok.AllArgsConstructor;
 public class Initializer implements CommandLineRunner {
 
     private UserService userService;
+	
     private UserRepository userRepository;
     private CodeRepository codeRepository;
 
     @Override
     @Transactional
     public void run(String... strings) throws Exception {
-        userRepository.save(new User(null, "admin", "***********", 0, false));
+        userRepository.save(new User(0L, "admin", "***********", 0, false));
 //        userRepository.save(new User(null, "alice", "1", 0));
 //        userRepository.save(new User(null, "bob", "2", 0));
         codeRepository.save(new Code("1", null, 3000));
@@ -35,6 +37,9 @@ public class Initializer implements CommandLineRunner {
         
         
         userService.signUp(new SignUpDto("alice", "1", "1"));
-        log.info("\"alice\" -> {}", userService.getUser("alice"));
+        log.info("\"alice\" -> {}", userService.getUser("alice").get());
+		userService.getMovements("alice").ifPresent(l -> l.stream().forEach(m -> {
+			log.info("{} - {}(cc {}) -> {}(cc {}): {}€ - {}", m.getDate(), m.getOriginName(), m.getOriginId(), m.getTargetName(), m.getTargetId(), m.getAmount(), m.getDescription());
+		}));
     }
 }

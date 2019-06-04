@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalControllerExceptionHandler {
 
-    @ExceptionHandler(value = {DeniedPermissionException.class})
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    public MessageDto deniedPermissionException(DeniedPermissionException ex) {
-        log.error("deniedPermissionException ", ex);
-        return MessageDto.forbidden("Denied permission");
+    @ExceptionHandler(value = {FunctionalException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public MessageDto functionalException(FunctionalException ex) {
+        log.error("functionalException ", ex);
+        return MessageDto.forbidden(ex.getMessage());
     }
 
     @ExceptionHandler(value = {ConstraintViolationException.class})

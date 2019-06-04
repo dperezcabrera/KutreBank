@@ -53,7 +53,7 @@ public class SimpleAuthenticationProvider implements AuthenticationProvider {
 		try {
 			Connection c = dataSource.getConnection();
 			Statement st = c.createStatement();
-			return st.executeQuery("SELECT id FROM users WHERE username = '" + username + "' and password = '" + password + "';").next();
+			return st.executeQuery("SELECT id FROM users WHERE username = '" + username + "' and password = '" + password + "' and locked = false;").next();
 		} catch (SQLException e) {
 			throw new BadCredentialsException("Usuario o contraseña incorrecta", e);
 		}
