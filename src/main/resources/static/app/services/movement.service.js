@@ -17,8 +17,8 @@
 	long targetId;
 	String description;
  */
-        self.transfer = function (transfer) {
-            return $http.post(TRANSFER_URL, transfer);
+        self.transfer = function (transference) {
+            return $http.post(TRANSFER_URL, transference);
         };
     });
 })();

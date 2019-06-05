@@ -15,8 +15,8 @@
 
         function login(promise) {
             var deferred = $q.defer();
-            promise.then(function (data) {
-                self.user = data;
+            promise.then(function (response) {
+                self.user = response.data;
                 self.authenticated = true;
                 deferred.resolve();
             }, function (error) {
@@ -40,7 +40,7 @@
 
         self.logout = function () {
             if (self.authenticated) {
-                $http.get(LOGOUT_REST_URL);
+                $http.post(LOGOUT_REST_URL);
                 logout();
             }
         };

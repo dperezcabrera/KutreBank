@@ -6,6 +6,7 @@ import com.github.dperezcabrera.bank.architecture.auth.dtos.TransferDto;
 import com.github.dperezcabrera.bank.architecture.auth.services.FeatureService;
 import com.github.dperezcabrera.bank.architecture.auth.services.UserService;
 import com.github.dperezcabrera.bank.architecture.common.MessageDto;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -57,7 +58,7 @@ public class MovementController {
 		if (!featureService.isActive(Features.XSS)) {
 			s = s.map(this::map);
 		}
-		return ResponseEntity.ok(s.collect(Collectors.toList()));
+		return ResponseEntity.ok(s.sorted(Comparator.comparing(MovementDto::getDate).reversed()).collect(Collectors.toList()));
 	}
 
 	private MovementDto map(MovementDto m) {

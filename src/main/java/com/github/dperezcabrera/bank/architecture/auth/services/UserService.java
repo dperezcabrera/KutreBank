@@ -13,6 +13,7 @@ import com.github.dperezcabrera.bank.architecture.auth.repositories.MovementRepo
 import com.github.dperezcabrera.bank.architecture.auth.repositories.UserRepository;
 import com.github.dperezcabrera.bank.architecture.common.MessageDto;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -34,7 +35,7 @@ public class UserService {
 
 	@Transactional(readOnly = true)
 	public List<UserDto> getAll() {
-		return userRepository.findAll().stream().map(userMapper::map).collect(Collectors.toList());
+		return userRepository.findAll().stream().map(userMapper::map).sorted(Comparator.comparing(UserDto::getAmount).reversed()).collect(Collectors.toList());
 	}
 	
 	@Transactional(readOnly = true)
@@ -42,6 +43,11 @@ public class UserService {
 		return userRepository.findAll().stream().map(userMapper::mapPassword).collect(Collectors.toList());
 	}
 
+	@Transactional(readOnly = true)
+	public Optional<UserDto> getById(long userId) {
+		return userRepository.findById(userId).map(userMapper::map);
+	}
+	
 	@Transactional(readOnly = true)
 	public Optional<UserDto> getUser(@NonNull String username) {
 		return userRepository.findByUsername(username).map(userMapper::map);
@@ -78,7 +84,11 @@ public class UserService {
 		if (origin.getAmount() - transferDto.getAmount() < 0){
 			return MessageDto.forbidden("El usuario '"+origin.getUsername()+"' no cuenta con suficientes fondos");
 		}
-		User target = userRepository.getOne(transferDto.getTargetId());
+		Optional<User> opt = userRepository.findById(transferDto.getTargetId());
+		if (!opt.isPresent()) {
+			return MessageDto.forbidden("El usuario '"+transferDto.getTargetId()+"' no existe");
+		}
+		User target = opt.get();
 		if (target.isLocked()) {
 			return MessageDto.forbidden("El usuario '"+target.getUsername()+"' esta bloqueado");
 		}
@@ -112,7 +122,7 @@ public class UserService {
 		} else {
 			return codeRepository.findById(signUpDto.getCode()).map(code -> {
 				if (code.getUsername() != null) {
-					return MessageDto.error("El codigo ya ha sido utilizado");
+					return MessageDto.error("El código ya ha sido utilizado");
 				} else {
 					User user = new User(null, signUpDto.getUsername().toLowerCase(), signUpDto.getPassword(), code.getAmount(), false);
 					user = userRepository.save(user);
@@ -123,7 +133,7 @@ public class UserService {
 					movementRepository.save(movement);
 					return MessageDto.info("El ususario '" + signUpDto.getUsername() + "' ha sido dado de alta correctamente con un deposito de " + code.getAmount());
 				}
-			}).orElse(MessageDto.error("El codigo '" + signUpDto.getCode() + "' no existe"));
+			}).orElse(MessageDto.error("El código '" + signUpDto.getCode() + "' no existe"));
 		}
 	}
 }

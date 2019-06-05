@@ -43,13 +43,21 @@ public class UserController {
 		return userService.changePassword(username, changePasswordDto, true).toResponse();
 	}
 	
-	@GetMapping
-	public ResponseEntity<List<UserDto>> getAll() {
+	@GetMapping("/detail/{id}")
+	public ResponseEntity<UserDto> getById(@PathVariable("id") long userId) {
 		if (featureService.isActive(Features.DATA_LEAK) || roleChecker.isAdmin()) {
-			return ResponseEntity.ok(userService.getAll());
+			return userService.getById(userId)
+					.map(ResponseEntity::ok)
+					.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 		} else {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
+	}
+	
+	@GetMapping
+	@PreAuthorize("@roleChecker.isAdmin()")
+	public ResponseEntity<List<UserDto>> getAll() {
+		return ResponseEntity.ok(userService.getAll());
 	}
 
 	@GetMapping("/passwords")

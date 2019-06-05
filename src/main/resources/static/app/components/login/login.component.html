@@ -4,7 +4,7 @@
             <div class="col-md-6"></div>
             <div class="col-md-5">
                 <div>
-                    <div class="login-box">
+                    <div class="login-box" style="margin-top: 50%;">
                         <div class="login-box-background">
                             <form>
                                 <div class="form-group" ng-class="{'has-error': ctrl.credentials.error}">
@@ -32,7 +32,76 @@
                                     <span class="label label-danger" ng-if="ctrl.credentials.error">{{ctrl.credentials.error}}</span>
                                 </div>
                                 <div class="form-group" style="margin-top: 40px; padding: 0 30%;">
-                                    <button ng-click="ctrl.login()" id="submit-login" name="submit-login" type="submit" class="btn btn-primary btn-lg btn-block login-button">Entrar</button>
+                                    <button style="display: inline" ng-click="ctrl.login()" id="submit-login" name="submit-login" type="submit" class="btn btn-primary btn-lg btn-block login-button">Entrar</button>
+                                    <div style="text-align: center; margin-top: 10px"><a href="#" ng-click="ctrl.state = 'signup'">Registrar</a></div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div ng-show="ctrl.state === 'signup'" class="container-fluid">
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-5">
+                <div>
+                    <div class="login-box" style="margin-top: 15%;">
+                        <div class="login-box-background">
+                            <form>
+                                <div class="form-group" ng-class="{'has-error': ctrl.signupData.error}">
+                                    <label for="username" class="cols-sm-2 control-label">Nombre de usuario</label>
+                                    <div class="cols-sm-10">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <div class="form-background-label input-group-text"><i class="login-color fa fa-user fa" aria-hidden="true"></i></div>
+                                            </div>
+                                            <input type="text" class="form-border-input form-control" name="signup-username" id="signup-username" required="" placeholder="Introduce tu nombre de usuario" data-ng-model="ctrl.signupData.username"/>
+                                        </div>
+                                    </div>
+                                    <span class="label label-danger" ng-if="ctrl.signupData.error">{{ctrl.signupData.error}}</span>
+                                </div>
+                                <div class="form-group" ng-class="{'has-error': ctrl.signupData.error}">
+                                    <label for="code" class="cols-sm-2 control-label">Código</label>
+                                    <div class="cols-sm-10">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <div class="form-background-label input-group-text"><i class="login-color fas fa-check-square" aria-hidden="true"></i></div>
+                                            </div>
+                                            <input type="password" class="form-border-input form-control" name="code" id="code" required="" placeholder="Introduce tu código de acceso" data-ng-model="ctrl.signupData.code"/>
+                                        </div>
+                                    </div>
+                                    <span class="label label-danger" ng-if="ctrl.signupData.error">{{ctrl.signupData.error}}</span>
+                                </div>
+                                <div class="form-group" ng-class="{'has-error': ctrl.signupData.error}">
+                                    <label for="signup-password" class="cols-sm-2 control-label">Contraseña</label>
+                                    <div class="cols-sm-10">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <div class="form-background-label input-group-text"><i class="login-color fa fa-lock fa" aria-hidden="true"></i></div>
+                                            </div>
+                                            <input type="password" class="form-border-input form-control" name="signup-password" id="signup-password" required="" placeholder="Introduce la contraseña" data-ng-model="ctrl.signupData.password"/>
+                                        </div>
+                                    </div>
+                                    <span class="label label-danger" ng-if="ctrl.signupData.error">{{ctrl.signupData.error}}</span>
+                                </div>
+                                <div class="form-group" ng-class="{'has-error': ctrl.signupData.error}">
+                                    <label for="signup-password2" class="cols-sm-2 control-label">Repite contraseña</label>
+                                    <div class="cols-sm-10">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <div class="form-background-label input-group-text"><i class="login-color fa fa-lock fa" aria-hidden="true"></i></div>
+                                            </div>
+                                            <input type="password" class="form-border-input form-control" name="signup-password2" id="signup-password2" required="" placeholder="Introduce la contraseña otra vez" data-ng-model="ctrl.signupData.password2"/>
+                                        </div>
+                                    </div>
+                                    <span class="label label-danger" ng-if="ctrl.signupData.error">{{ctrl.signupData.error}}</span>
+                                </div>
+
+                                <div class="form-group" style="margin-top: 40px; padding: 0 0; height: 40px">
+                                    <div style="float: right"><button ng-click="ctrl.signUp()" id="submit-signup" name="submit-signup" type="submit" class="btn btn-primary btn-lg btn-block login-button">Registrar</button></div>
+                                    <div style="float: left"><button ng-click="ctrl.state = 'login'" id="cancel-signup" name="cancel-signup" type="submit" class="btn btn-info btn-lg btn-block login-button">Cancelar</button></div>
                                 </div>
                             </form>
                         </div>
