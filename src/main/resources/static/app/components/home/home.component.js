@@ -3,17 +3,16 @@
 
     var app = angular.module('App');
 
-    app.controller('HomeCtrl', function (credentials, $routeParams, $location) {
-        var vm = this;
-        vm.courses = [];
-        vm.state = 'waiting';
-        
-        vm.init = function() {
-            if (credentials.authenticatedUser()) {
+    app.component('home.component', {
+        templateUrl: '/app/components/home/home.component.html',
+        controllerAs: 'ctrl',
+        controller: function () {
+            var vm = this;
+            vm.state = 'waiting';
+
+            vm.$onInit = function () {
                 vm.state = 'ready';
-            }
-        };
-        
-        vm.init();
-    });
+            };
+
+        }});
 })();

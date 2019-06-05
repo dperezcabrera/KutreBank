@@ -34,13 +34,13 @@ public class UserController {
 
 	@PostMapping("/change-password")
 	public ResponseEntity<MessageDto> postChangePassword(@RequestBody ChangePasswordDto changePasswordDto){
-		return userService.changePassword(auditor.getCurrentAuditor().get(), changePasswordDto).toResponse();
+		return userService.changePassword(auditor.getCurrentAuditor().get(), changePasswordDto, false).toResponse();
 	}
 	
 	@PostMapping("/change-password/{username}")
 	@PreAuthorize("@roleChecker.isAdmin()")
 	public ResponseEntity<MessageDto> postChangePassword(@PathVariable("username") String username, @RequestBody ChangePasswordDto changePasswordDto){
-		return userService.changePassword(username, changePasswordDto).toResponse();
+		return userService.changePassword(username, changePasswordDto, true).toResponse();
 	}
 	
 	@GetMapping

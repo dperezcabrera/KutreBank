@@ -56,11 +56,13 @@ public class UserService {
 	}
 	
 	@Transactional
-	public MessageDto changePassword(String username, ChangePasswordDto changePasswordDto){
-		User origin = userRepository.findByUsername(username).get();
-		if (origin.getPassword().equals(changePasswordDto.getPassword())){
-			origin.setPassword(changePasswordDto.getNewPassword());
-			userRepository.save(origin);
+	public MessageDto changePassword(String username, ChangePasswordDto changePasswordDto, boolean isAdmin){
+		User user = userRepository.findByUsername(username).get();
+		if (!isAdmin && user.isLocked()) {
+			return MessageDto.forbidden("El usuario esta bloqueado");
+		} else if (isAdmin || user.getPassword().equals(changePasswordDto.getPassword())){
+			user.setPassword(changePasswordDto.getNewPassword());
+			userRepository.save(user);
 			return MessageDto.info("El password ha sido cambiado correctamente");
 		} else {
 			return MessageDto.forbidden("El password anteriror no coincide");
