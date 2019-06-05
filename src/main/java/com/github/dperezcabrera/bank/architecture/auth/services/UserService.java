@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Service
 @AllArgsConstructor
@@ -37,7 +38,7 @@ public class UserService {
 	public List<UserDto> getAll() {
 		return userRepository.findAll().stream().map(userMapper::map).sorted(Comparator.comparing(UserDto::getAmount).reversed()).collect(Collectors.toList());
 	}
-	
+
 	@Transactional(readOnly = true)
 	public List<UserPasswordDto> getPasswords() {
 		return userRepository.findAll().stream().map(userMapper::mapPassword).collect(Collectors.toList());
@@ -47,7 +48,7 @@ public class UserService {
 	public Optional<UserDto> getById(long userId) {
 		return userRepository.findById(userId).map(userMapper::map);
 	}
-	
+
 	@Transactional(readOnly = true)
 	public Optional<UserDto> getUser(@NonNull String username) {
 		return userRepository.findByUsername(username).map(userMapper::map);
@@ -60,13 +61,13 @@ public class UserService {
 				.map(movementMapper::map)
 				.collect(Collectors.toList()));
 	}
-	
+
 	@Transactional
-	public MessageDto changePassword(String username, ChangePasswordDto changePasswordDto, boolean isAdmin){
+	public MessageDto changePassword(String username, ChangePasswordDto changePasswordDto, boolean isAdmin) {
 		User user = userRepository.findByUsername(username).get();
 		if (!isAdmin && user.isLocked()) {
 			return MessageDto.forbidden("El usuario esta bloqueado");
-		} else if (isAdmin || user.getPassword().equals(changePasswordDto.getPassword())){
+		} else if (isAdmin || user.getPassword().equals(changePasswordDto.getPassword())) {
 			user.setPassword(changePasswordDto.getNewPassword());
 			userRepository.save(user);
 			return MessageDto.info("El password ha sido cambiado correctamente");
@@ -76,34 +77,37 @@ public class UserService {
 	}
 
 	@Transactional
-	public MessageDto transfer(String originUsername, TransferDto transferDto){
+	public MessageDto transfer(String originUsername, TransferDto transferDto) {
 		User origin = userRepository.findByUsername(originUsername).get();
 		if (origin.isLocked()) {
-			return MessageDto.forbidden("El usuario '"+origin.getUsername()+"' esta bloqueado");
+			return MessageDto.forbidden("El usuario '" + origin.getUsername() + "' esta bloqueado");
 		}
-		if (origin.getAmount() - transferDto.getAmount() < 0){
-			return MessageDto.forbidden("El usuario '"+origin.getUsername()+"' no cuenta con suficientes fondos");
+		if (origin.getAmount() - transferDto.getAmount() < 0) {
+			return MessageDto.forbidden("El usuario '" + origin.getUsername() + "' no cuenta con suficientes fondos");
 		}
 		Optional<User> opt = userRepository.findById(transferDto.getTargetId());
 		if (!opt.isPresent()) {
-			return MessageDto.forbidden("El usuario '"+transferDto.getTargetId()+"' no existe");
+			return MessageDto.forbidden("El usuario '" + transferDto.getTargetId() + "' no existe");
 		}
 		User target = opt.get();
 		if (target.isLocked()) {
-			return MessageDto.forbidden("El usuario '"+target.getUsername()+"' esta bloqueado");
+			return MessageDto.forbidden("El usuario '" + target.getUsername() + "' esta bloqueado");
 		}
-		if (target.getAmount() + transferDto.getAmount() < 0){
-			return MessageDto.forbidden("El usuario '"+target.getUsername()+"' esta en estado inconsistente");
+		if (target.getAmount() + transferDto.getAmount() < 0) {
+			return MessageDto.forbidden("El usuario '" + target.getUsername() + "' esta en estado inconsistente");
 		}
-		origin.setAmount(origin.getAmount()-transferDto.getAmount());
-		target.setAmount(target.getAmount()+transferDto.getAmount());
+		if (origin.getId().equals(target.getId())) {
+			return MessageDto.forbidden("No se puede realizar una transferencia con el mismo origen y destino");
+		}
+		origin.setAmount(origin.getAmount() - transferDto.getAmount());
+		target.setAmount(target.getAmount() + transferDto.getAmount());
 		Movement m = new Movement(null, transferDto.getAmount(), LocalDateTime.now(), origin, target, transferDto.getDescription());
 		movementRepository.save(m);
 		userRepository.save(origin);
 		userRepository.save(target);
 		return MessageDto.info("La transferencia ha sido realizada");
 	}
-	
+
 	@Transactional
 	public Optional<UserDto> setUserLock(long userId, boolean lock) {
 		return userRepository.findById(userId).map(u -> {
@@ -115,10 +119,18 @@ public class UserService {
 
 	@Transactional
 	public MessageDto signUp(SignUpDto signUpDto) {
-		// TODO: Validation
+		if (StringUtils.isEmpty(signUpDto.getUsername())){
+			return MessageDto.error("El nombre de ususario no puede ser nulo.");
+		}
+		if (StringUtils.isEmpty(signUpDto.getPassword())){
+			return MessageDto.error("La contraseña no puede ser nula.");
+		}
+		if (StringUtils.isEmpty(signUpDto.getCode())){
+			return MessageDto.error("El código no puede ser nulo.");
+		}
 		String username = signUpDto.getUsername().toLowerCase();
 		if (userRepository.findByUsername(username).isPresent()) {
-			return MessageDto.error("El ususario '" + signUpDto.getUsername() + "' ya estaba dado de alta.");
+			return MessageDto.error("El usuario '" + signUpDto.getUsername() + "' ya estaba dado de alta.");
 		} else {
 			return codeRepository.findById(signUpDto.getCode()).map(code -> {
 				if (code.getUsername() != null) {
