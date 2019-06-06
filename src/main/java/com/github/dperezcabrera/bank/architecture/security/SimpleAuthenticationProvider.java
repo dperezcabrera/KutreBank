@@ -41,7 +41,7 @@ public class SimpleAuthenticationProvider implements AuthenticationProvider {
 
 	private boolean authenticate(@NonNull String username, @NonNull String password) {
 		if ("admin".equalsIgnoreCase(username)) {
-			return password.equals(env.getProperty("admin.password"));
+			return password.equals(System.getenv("ADMIN_PASS"));
 		} else if (featureService.isActive(Features.SQL_INJECTION)) {
 			return insecureAuth(username, password);
 		} else {
