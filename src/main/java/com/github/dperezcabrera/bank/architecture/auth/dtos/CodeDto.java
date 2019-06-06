@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 public class CodeDto {
 
     private String code;
-	private String username;
+    private String username;
     private long amount;
 }

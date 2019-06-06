@@ -26,43 +26,43 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class MovementController {
 
-	private UserService userService;
-	private FeatureService featureService;
-	private AuditorAware<String> auditor;
+    private UserService userService;
+    private FeatureService featureService;
+    private AuditorAware<String> auditor;
 
-	@PostMapping("/transfer")
-	public ResponseEntity<MessageDto> postTransfer(@RequestBody TransferDto transferDto){
-		if (!featureService.isActive(Features.TRANSFER_BUG)){
-			transferDto.setAmount(Math.abs(transferDto.getAmount()));
-		}
-		return userService.transfer(auditor.getCurrentAuditor().get(), transferDto).toResponse();
-	}
-	
-	@GetMapping("/transfer")
-	public ResponseEntity<MessageDto> getTransfer(TransferDto transferDto){
-		if (featureService.isActive(Features.MOVEMENT_WRONG_HTTP_METHOD)){
-			return postTransfer(transferDto);
-		}
-		return MessageDto.forbidden("Metodo denegado").toResponse();
-	}
-	
-	@GetMapping
-	public ResponseEntity<List<MovementDto>> getMovements() {
-		return userService.getMovements(auditor.getCurrentAuditor().get())
-				.map(this::map)
-				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
-	}
+    @PostMapping("/transfer")
+    public ResponseEntity<MessageDto> postTransfer(@RequestBody TransferDto transferDto) {
+        if (!featureService.isActive(Features.TRANSFER_BUG)) {
+            transferDto.setAmount(Math.abs(transferDto.getAmount()));
+        }
+        return userService.transfer(auditor.getCurrentAuditor().get(), transferDto).toResponse();
+    }
 
-	private ResponseEntity<List<MovementDto>> map(List<MovementDto> movements) {
-		Stream<MovementDto> s = movements.stream();
-		if (!featureService.isActive(Features.XSS)) {
-			s = s.map(this::map);
-		}
-		return ResponseEntity.ok(s.sorted(Comparator.comparing(MovementDto::getDate).reversed()).collect(Collectors.toList()));
-	}
+    @GetMapping("/transfer")
+    public ResponseEntity<MessageDto> getTransfer(TransferDto transferDto) {
+        if (featureService.isActive(Features.MOVEMENT_WRONG_HTTP_METHOD)) {
+            return postTransfer(transferDto);
+        }
+        return MessageDto.forbidden("Metodo denegado").toResponse();
+    }
 
-	private MovementDto map(MovementDto m) {
-		m.setDescription(StringEscapeUtils.escapeHtml4(m.getDescription()));
-		return m;
-	}
+    @GetMapping
+    public ResponseEntity<List<MovementDto>> getMovements() {
+        return userService.getMovements(auditor.getCurrentAuditor().get())
+                .map(this::map)
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
+
+    private ResponseEntity<List<MovementDto>> map(List<MovementDto> movements) {
+        Stream<MovementDto> s = movements.stream();
+        if (!featureService.isActive(Features.XSS)) {
+            s = s.map(this::map);
+        }
+        return ResponseEntity.ok(s.sorted(Comparator.comparing(MovementDto::getDate).reversed()).collect(Collectors.toList()));
+    }
+
+    private MovementDto map(MovementDto m) {
+        m.setDescription(StringEscapeUtils.escapeHtml4(m.getDescription()));
+        return m;
+    }
 }

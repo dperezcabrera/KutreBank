@@ -30,7 +30,7 @@ public class User implements Serializable {
 
     @Column(nullable = false)
     private long amount;
-    
+
     @Column(nullable = false)
     private boolean locked;
 }

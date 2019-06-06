@@ -10,6 +10,6 @@ public class UserDto {
     private String username;
 
     private long amount;
-	
-	private boolean locked;
+
+    private boolean locked;
 }

@@ -18,41 +18,41 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class FeatureController {
 
-	private FeatureService featureService;
+    private FeatureService featureService;
 
-	@GetMapping("/all")
-	@PreAuthorize("@roleChecker.isAdmin()")
-	public ResponseEntity<List<String>> getAll() {
-		return ResponseEntity.ok(featureService.getAllFeatures());
-	}
+    @GetMapping("/all")
+    @PreAuthorize("@roleChecker.isAdmin()")
+    public ResponseEntity<List<String>> getAll() {
+        return ResponseEntity.ok(featureService.getAllFeatures());
+    }
 
-	@GetMapping("/active")
-	@PreAuthorize("@roleChecker.isAdmin()")
-	public ResponseEntity<List<String>> getActives() {
-		return ResponseEntity.ok(featureService.getActiveFeatures());
-	}
+    @GetMapping("/active")
+    @PreAuthorize("@roleChecker.isAdmin()")
+    public ResponseEntity<List<String>> getActives() {
+        return ResponseEntity.ok(featureService.getActiveFeatures());
+    }
 
-	@PutMapping("/active")
-	@PreAuthorize("@roleChecker.isAdmin()")
-	public ResponseEntity<Void> actives(@RequestBody FeaturesDto features) {
-		featureService.setActiveFeatures(features.getFeatures());
-		return ResponseEntity.ok().body(null);
-	}
+    @PutMapping("/active")
+    @PreAuthorize("@roleChecker.isAdmin()")
+    public ResponseEntity<Void> actives(@RequestBody FeaturesDto features) {
+        featureService.setActiveFeatures(features.getFeatures());
+        return ResponseEntity.ok().body(null);
+    }
 
-	@PutMapping("/active-all")
-	@PreAuthorize("@roleChecker.isAdmin()")
-	public ResponseEntity<Void> activeAll() {
-		featureService.setActiveFeatures(featureService.getAllFeatures());
-		return ResponseEntity.ok().body(null);
-	}
+    @PutMapping("/active-all")
+    @PreAuthorize("@roleChecker.isAdmin()")
+    public ResponseEntity<Void> activeAll() {
+        featureService.setActiveFeatures(featureService.getAllFeatures());
+        return ResponseEntity.ok().body(null);
+    }
 
-	@PutMapping("/deactivate")
-	@PreAuthorize("@roleChecker.isAdmin()")
-	public ResponseEntity<Void> deactivates(@RequestBody FeaturesDto features) {
-		List<String> activeFeatures = featureService.getActiveFeatures().stream()
-				.filter(f -> !features.getFeatures().contains(f))
-				.collect(Collectors.toList());
-		featureService.setActiveFeatures(activeFeatures);
-		return ResponseEntity.ok().body(null);
-	}
+    @PutMapping("/deactivate")
+    @PreAuthorize("@roleChecker.isAdmin()")
+    public ResponseEntity<Void> deactivates(@RequestBody FeaturesDto features) {
+        List<String> activeFeatures = featureService.getActiveFeatures().stream()
+                .filter(f -> !features.getFeatures().contains(f))
+                .collect(Collectors.toList());
+        featureService.setActiveFeatures(activeFeatures);
+        return ResponseEntity.ok().body(null);
+    }
 }

@@ -5,13 +5,13 @@ import lombok.Data;
 @Data
 public class UserPasswordDto {
 
-	private Long id;
-	
-	private String password;
+    private Long id;
 
-	private String username;
+    private String password;
 
-	private long amount;
+    private String username;
 
-	private boolean locked;
+    private long amount;
+
+    private boolean locked;
 }

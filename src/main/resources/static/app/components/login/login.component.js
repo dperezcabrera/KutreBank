@@ -37,17 +37,17 @@
                     });
                 }
             };
-            
-            ctrl.signUp = function (){
-                if (!ctrl.signupData.password || ctrl.signupData.password !== ctrl.signupData.password2){
+
+            ctrl.signUp = function () {
+                if (!ctrl.signupData.password || ctrl.signupData.password !== ctrl.signupData.password2) {
                     ctrl.signupData.error = "Las contraseñas no son iguales";
                     toastr.error("Las contraseñas no son iguales", "Error");
                 } else {
                     ctrl.state = 'waiting';
-                    AuthService.signUp({username: ctrl.signupData.username, password: ctrl.signupData.password, code: ctrl.signupData.code}).then(function (response){
+                    AuthService.signUp({username: ctrl.signupData.username, password: ctrl.signupData.password, code: ctrl.signupData.code}).then(function (response) {
                         ctrl.state = 'login';
                         toastr.info(response.data.description, "Información");
-                    }, function (error){
+                    }, function (error) {
                         ctrl.signupData.error = error.data.description;
                         toastr.error(error.data.description, "Error");
                         ctrl.state = 'signup';

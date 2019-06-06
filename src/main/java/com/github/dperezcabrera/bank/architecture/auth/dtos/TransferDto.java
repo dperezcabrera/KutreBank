@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TransferDto {
 
-	private long amount;
-	private long targetId;
-	private String description;
+    private long amount;
+    private long targetId;
+    private String description;
 }

@@ -8,8 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 @Repository
-public interface MovementRepository extends JpaRepository<Movement, Long>  {
-    
-	@Query("select m from Movement m where m.origin.id = :userId OR m.target.id = :userId")
+public interface MovementRepository extends JpaRepository<Movement, Long> {
+
+    @Query("select m from Movement m where m.origin.id = :userId OR m.target.id = :userId")
     List<Movement> findByUserId(@Param("userId") long userId);
 }

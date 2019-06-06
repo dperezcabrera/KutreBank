@@ -22,7 +22,7 @@ public class Code implements Serializable {
 
     @Column(length = 20)
     private String username;
-    
+
     @Column(nullable = false)
     private long amount;
 }

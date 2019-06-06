@@ -15,20 +15,21 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @AllArgsConstructor
 public class CodeService {
+
     private CodeRepository codeRepository;
     private CodeMapper codeMapper;
 
-	@Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public List<CodeDto> getAll() {
         return codeRepository.findAll().stream().map(codeMapper::map).collect(Collectors.toList());
     }
 
-	@Transactional
+    @Transactional
     public void createCode(String code, long amount) {
-		if (!codeRepository.findById(code).isPresent()) {
-			codeRepository.save(new Code(code, null, amount));
-		} else {
-			throw new FunctionalException("El codigo '"+code+"' ya existe");
-		}
+        if (!codeRepository.findById(code).isPresent()) {
+            codeRepository.save(new Code(code, null, amount));
+        } else {
+            throw new FunctionalException("El codigo '" + code + "' ya existe");
+        }
     }
 }

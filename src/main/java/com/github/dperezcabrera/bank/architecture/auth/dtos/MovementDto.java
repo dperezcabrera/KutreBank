@@ -9,12 +9,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class MovementDto {
 
-	private Long id;
-	private long amount;
-	private String date;
-	private String originName;
-	private long originId;
-	private String targetName;
-	private long targetId;
-	private String description;
+    private Long id;
+    private long amount;
+    private String date;
+    private String originName;
+    private long originId;
+    private String targetName;
+    private long targetId;
+    private String description;
 }

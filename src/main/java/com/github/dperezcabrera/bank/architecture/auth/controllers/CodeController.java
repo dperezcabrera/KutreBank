@@ -17,18 +17,18 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class CodeController {
 
-	private CodeService codeService;
+    private CodeService codeService;
 
-	@GetMapping
-	@PreAuthorize("@roleChecker.isAdmin()")
-	public ResponseEntity<List<CodeDto>> getAll() {
-		return ResponseEntity.ok(codeService.getAll());
-	}
+    @GetMapping
+    @PreAuthorize("@roleChecker.isAdmin()")
+    public ResponseEntity<List<CodeDto>> getAll() {
+        return ResponseEntity.ok(codeService.getAll());
+    }
 
-	@PostMapping
-	@PreAuthorize("@roleChecker.isAdmin()")
-	public ResponseEntity<String> createCode(@RequestBody CodeDto codeDto) {
-		codeService.createCode(codeDto.getCode(), codeDto.getAmount());
-		return ResponseEntity.ok().build();
-	}
+    @PostMapping
+    @PreAuthorize("@roleChecker.isAdmin()")
+    public ResponseEntity<String> createCode(@RequestBody CodeDto codeDto) {
+        codeService.createCode(codeDto.getCode(), codeDto.getAmount());
+        return ResponseEntity.ok().build();
+    }
 }
