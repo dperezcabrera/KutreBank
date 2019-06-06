@@ -12,11 +12,6 @@
             return $http.get(MOVEMENTS_URL);
         };
 
-        /*
-         long amount;
-         long targetId;
-         String description;
-         */
         self.transfer = function (transference) {
             return $http.post(TRANSFER_URL, transference);
         };
