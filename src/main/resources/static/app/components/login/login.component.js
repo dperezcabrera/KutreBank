@@ -44,7 +44,7 @@
                     toastr.error("Las contraseñas no son iguales", "Error");
                 } else {
                     ctrl.state = 'waiting';
-                    AuthService.signUp({username: ctrl.signupData.username, password: ctrl.signupData.password, code: ctrl.signupData.code}).then(function (response) {
+                    AuthService.signUp({username: ctrl.signupData.username, password: ctrl.signupData.password}).then(function (response) {
                         ctrl.state = 'login';
                         toastr.info(response.data.description, "Información");
                     }, function (error) {
