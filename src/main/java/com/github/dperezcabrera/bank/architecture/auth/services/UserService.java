@@ -3,14 +3,20 @@ package com.github.dperezcabrera.bank.architecture.auth.services;
 import com.github.dperezcabrera.bank.architecture.auth.dtos.ChangePasswordDto;
 import com.github.dperezcabrera.bank.architecture.auth.dtos.MovementDto;
 import com.github.dperezcabrera.bank.architecture.auth.dtos.SignUpDto;
+import com.github.dperezcabrera.bank.architecture.auth.dtos.TransferCodeDto;
 import com.github.dperezcabrera.bank.architecture.auth.dtos.TransferDto;
 import com.github.dperezcabrera.bank.architecture.auth.dtos.UserDto;
 import com.github.dperezcabrera.bank.architecture.auth.dtos.UserPasswordDto;
+import com.github.dperezcabrera.bank.architecture.auth.entities.Code;
 import com.github.dperezcabrera.bank.architecture.auth.entities.Movement;
+import com.github.dperezcabrera.bank.architecture.auth.entities.Team;
 import com.github.dperezcabrera.bank.architecture.auth.entities.User;
 import com.github.dperezcabrera.bank.architecture.auth.repositories.CodeRepository;
 import com.github.dperezcabrera.bank.architecture.auth.repositories.MovementRepository;
+import com.github.dperezcabrera.bank.architecture.auth.repositories.TeamRepository;
 import com.github.dperezcabrera.bank.architecture.auth.repositories.UserRepository;
+import com.github.dperezcabrera.bank.architecture.common.ForbiddenException;
+import com.github.dperezcabrera.bank.architecture.common.FunctionalException;
 import com.github.dperezcabrera.bank.architecture.common.MessageDto;
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -29,10 +35,16 @@ import org.springframework.util.StringUtils;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final TeamRepository teamRepository;
     private final CodeRepository codeRepository;
     private final MovementRepository movementRepository;
     private final UserMapper userMapper;
     private final MovementMapper movementMapper;
+
+    @Transactional(readOnly = true)
+    public List<String> getTeams() {
+        return teamRepository.findAll().stream().map(Team::getName).collect(Collectors.toList());
+    }
 
     @Transactional(readOnly = true)
     public List<UserDto> getAll() {
@@ -63,75 +75,75 @@ public class UserService {
     }
 
     @Transactional
-    public MessageDto changePassword(String username, ChangePasswordDto changePasswordDto, boolean isAdmin) {
+    public MessageDto changePassword(String username, ChangePasswordDto changePasswordDto) {
         User user = userRepository.findByUsername(username).get();
-        if (!isAdmin && user.isLocked()) {
-            return MessageDto.forbidden("El usuario esta bloqueado");
-        } else if (isAdmin || user.getPassword().equals(changePasswordDto.getPassword())) {
-            user.setPassword(changePasswordDto.getNewPassword());
-            userRepository.save(user);
-            return MessageDto.info("El password ha sido cambiado correctamente");
-        } else {
-            return MessageDto.forbidden("El password anteriror no coincide");
+        user.setPassword(changePasswordDto.getNewPassword());
+        userRepository.save(user);
+        return new MessageDto("El password ha sido cambiado correctamente");
+    }
+
+    User checkUser(Optional<User> opt, String msg) {
+        return opt.orElseThrow(() -> new ForbiddenException(msg));
+    }
+
+    void checkNonNegativeAmount(User user) {
+        if (user.getAmount() < 0) {
+            throw new ForbiddenException("El usuario '" + user.getUsername() + "' no cuenta con suficientes fondos");
         }
+    }
+    
+    @Transactional
+    public MessageDto transfer(String username, TransferCodeDto transferCodeDto) {
+        User user = checkUser(userRepository.findByUsername(username.toLowerCase()), "El usuario '" + username + "' no exsite");
+        Code code = codeRepository.getOne(transferCodeDto.getCode());
+        if (code.getUsername() != null){
+            throw new ForbiddenException("El codigo ya ha sido utilizado");
+        }
+        user.setAmount(user.getAmount() + code.getAmount());
+        code.setUsername(username);
+        Movement m = new Movement(null, code.getAmount(), LocalDateTime.now(), null, user, "Transferencia desde codigo: '"+transferCodeDto.getCode());
+        userRepository.save(user);
+        codeRepository.save(code);
+        movementRepository.save(m);
+        return new MessageDto("La transferencia ha sido realizada");
     }
 
     @Transactional
     public MessageDto transfer(String originUsername, TransferDto transferDto) {
-        User origin = userRepository.findByUsername(originUsername).get();
-        if (origin.isLocked()) {
-            return MessageDto.forbidden("El usuario '" + origin.getUsername() + "' esta bloqueado");
-        }
-        if (origin.getAmount() - transferDto.getAmount() < 0) {
-            return MessageDto.forbidden("El usuario '" + origin.getUsername() + "' no cuenta con suficientes fondos");
-        }
-        Optional<User> opt = userRepository.findById(transferDto.getTargetId());
-        if (!opt.isPresent()) {
-            return MessageDto.forbidden("El usuario '" + transferDto.getTargetId() + "' no existe");
-        }
-        User target = opt.get();
-        if (target.isLocked()) {
-            return MessageDto.forbidden("El usuario '" + target.getUsername() + "' esta bloqueado");
-        }
-        if (target.getAmount() + transferDto.getAmount() < 0) {
-            return MessageDto.forbidden("El usuario '" + target.getUsername() + "' esta en estado inconsistente");
-        }
+        User origin = checkUser(userRepository.findByUsername(originUsername.toLowerCase()), "El usuario '" + originUsername + "' no exsite");
+        User target = checkUser(userRepository.findById(transferDto.getTargetId()), "La cc de destino: " + transferDto.getTargetId() + "' no exsite");
         if (origin.getId().equals(target.getId())) {
-            return MessageDto.forbidden("No se puede realizar una transferencia con el mismo origen y destino");
+            throw new ForbiddenException("No se puede realizar una transferencia con el mismo origen y destino");
         }
         origin.setAmount(origin.getAmount() - transferDto.getAmount());
         target.setAmount(target.getAmount() + transferDto.getAmount());
+        checkNonNegativeAmount(origin);
+        checkNonNegativeAmount(target);
         Movement m = new Movement(null, transferDto.getAmount(), LocalDateTime.now(), origin, target, transferDto.getDescription());
         movementRepository.save(m);
         userRepository.save(origin);
         userRepository.save(target);
-        return MessageDto.info("La transferencia ha sido realizada");
+        return new MessageDto("La transferencia ha sido realizada");
     }
 
-    @Transactional
-    public Optional<UserDto> setUserLock(long userId, boolean lock) {
-        return userRepository.findById(userId).map(u -> {
-            u.setLocked(lock);
-            userRepository.save(u);
-            return userMapper.map(u);
-        });
+    private void checkEmptyString(String str, String msg) {
+        if (StringUtils.isEmpty(str)) {
+            throw new FunctionalException(msg);
+        }
     }
 
     @Transactional
     public MessageDto signUp(SignUpDto signUpDto) {
-        if (StringUtils.isEmpty(signUpDto.getUsername())) {
-            return MessageDto.error("El nombre de ususario no puede ser nulo.");
-        }
-        if (StringUtils.isEmpty(signUpDto.getPassword())) {
-            return MessageDto.error("La contraseña no puede ser nula.");
-        }
+        checkEmptyString(signUpDto.getUsername(), "El nombre de ususario no puede ser nulo.");
+        checkEmptyString(signUpDto.getPassword(), "La contraseña no puede ser nula.");
+        checkEmptyString(signUpDto.getTeam(), "El equipo no puede ser nulo.");
         String username = signUpDto.getUsername().toLowerCase();
         if (userRepository.findByUsername(username).isPresent()) {
-            return MessageDto.error("El usuario '" + signUpDto.getUsername() + "' ya estaba dado de alta.");
-        } else {
-            User user = new User(null, signUpDto.getUsername().toLowerCase(), signUpDto.getPassword(), 0L, false);
-            userRepository.save(user);
-            return MessageDto.info("El ususario '" + signUpDto.getUsername() + "' ha sido dado de alta correctamente");
+            throw new FunctionalException("Ya existia un usuario con nombre: '" + signUpDto.getUsername() + "' dado de alta.");
         }
+        Team team = teamRepository.getOne(signUpDto.getTeam().toLowerCase());
+        User user = new User(null, signUpDto.getUsername().toLowerCase(), signUpDto.getPassword(), team, 0L);
+        userRepository.save(user);
+        return new MessageDto("El ususario '" + signUpDto.getUsername() + "' ha sido dado de alta correctamente");
     }
 }

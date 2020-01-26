@@ -17,7 +17,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,27 +30,26 @@ public class UserController {
     private FeatureService featureService;
     private RoleChecker roleChecker;
     private AuditorAware<String> auditor;
-
+    
     @PostMapping("/change-password")
     public ResponseEntity<MessageDto> postChangePassword(@RequestBody ChangePasswordDto changePasswordDto) {
-        return userService.changePassword(auditor.getCurrentAuditor().get(), changePasswordDto, false).toResponse();
+        return ResponseEntity.ok(userService.changePassword(auditor.getCurrentAuditor().get(), changePasswordDto));
     }
 
     @PostMapping("/change-password/{username}")
     @PreAuthorize("@roleChecker.isAdmin()")
     public ResponseEntity<MessageDto> postChangePassword(@PathVariable("username") String username, @RequestBody ChangePasswordDto changePasswordDto) {
-        return userService.changePassword(username, changePasswordDto, true).toResponse();
+        return ResponseEntity.ok(userService.changePassword(username, changePasswordDto));
     }
 
     @GetMapping("/detail/{id}")
     public ResponseEntity<UserDto> getById(@PathVariable("id") long userId) {
-        if (featureService.isActive(Features.DATA_LEAK) || roleChecker.isAdmin()) {
-            return userService.getById(userId)
-                    .map(ResponseEntity::ok)
-                    .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
-        } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        if (!roleChecker.isAdmin()) {
+            featureService.checkFeature(Features.DATA_LEAK);
         }
+        return userService.getById(userId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
     @GetMapping
@@ -63,18 +61,6 @@ public class UserController {
     @GetMapping("/passwords")
     @PreAuthorize("@roleChecker.isAdmin()")
     public ResponseEntity<List<UserPasswordDto>> getPasswordAll() {
-        if (featureService.isActive(Features.DATA_LEAK) || roleChecker.isAdmin()) {
-            return ResponseEntity.ok(userService.getPasswords());
-        } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-    }
-
-    @PutMapping("/locked/{id}/{locked}")
-    @PreAuthorize("@roleChecker.isAdmin()")
-    public ResponseEntity<UserDto> setLock(@PathVariable("id") long userId, @PathVariable("locked") boolean locked) {
-        return userService.setUserLock(userId, locked)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+        return ResponseEntity.ok(userService.getPasswords());
     }
 }

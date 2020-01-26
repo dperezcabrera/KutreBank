@@ -3,13 +3,13 @@
 
     var app = angular.module('App');
 
-    app.service('AuthGuard', function ($state, AuthService, LOGIN_STATE) {
+    app.service('AuthGuard', function ($state, AuthService, STATE) {
         var self = this;
 
         self.canActivate = function () {
             var result = false;
             if (!AuthService.isAuthenticated()) {
-                $state.go(LOGIN_STATE);
+                $state.go(STATE.SIGN_IN);
             } else {
                 result = true;
             }

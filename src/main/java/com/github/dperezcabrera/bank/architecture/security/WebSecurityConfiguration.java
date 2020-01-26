@@ -42,6 +42,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     private static final String[] AUTH_WHITELIST = {
         "/",
         "/auth/*",
+        "/teams",
         "/*.html",
         "/**/*.html",
         "/**/*.css",

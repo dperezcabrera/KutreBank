@@ -9,6 +9,7 @@
         var LOGIN_REST_URL = "/auth/login";
         var LOGOUT_REST_URL = "/auth/logout";
         var SIGNUP_REST_URL = "/auth/signup";
+        var TEAMS_REST_URL = "/teams";
 
         self.authenticated = false;
         self.user = {username: 'unknown'};
@@ -25,12 +26,16 @@
             return deferred.promise;
         }
 
-        self.login = function (user) {
+        self.signIn = function (user) {
             return login($http.post(LOGIN_REST_URL, user));
         };
 
         self.obtainProfile = function () {
             return login($http.get(LOGIN_REST_URL));
+        };
+        
+        self.obtainTeams = function () {
+            return $http.get(TEAMS_REST_URL);
         };
 
         function logout() {

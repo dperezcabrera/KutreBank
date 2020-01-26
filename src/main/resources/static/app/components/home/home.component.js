@@ -6,7 +6,7 @@
     app.component('home.component', {
         templateUrl: '/app/components/home/home.component.html',
         controllerAs: 'ctrl',
-        controller: function (MovementService, AuthService, $state, toastr, LOGIN_STATE) {
+        controller: function (MovementService, AuthService, $state, toastr, STATE) {
             var ctrl = this;
             ctrl.state = 'waiting';
             ctrl.user = {};
@@ -27,21 +27,6 @@
                     ctrl.user.amount = amount;
                     ctrl.state = 'ready';
                 });
-            };
-
-            ctrl.transfer = function () {
-                MovementService.transfer(ctrl.transferData).then(function (response) {
-                    toastr.info(response.data.description, "Información");
-                    ctrl.user.amount = ctrl.user.amount - ctrl.transferData.amount;
-                    ctrl.$onInit();
-                }, function (error) {
-                    toastr.error(error.data.description, "Error");
-                });
-            };
-
-            ctrl.logout = function () {
-                AuthService.logout();
-                $state.go(LOGIN_STATE);
             };
         }});
 })();

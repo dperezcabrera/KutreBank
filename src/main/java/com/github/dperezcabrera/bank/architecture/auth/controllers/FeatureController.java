@@ -1,15 +1,13 @@
 package com.github.dperezcabrera.bank.architecture.auth.controllers;
 
-import com.github.dperezcabrera.bank.architecture.auth.dtos.FeaturesDto;
+import com.github.dperezcabrera.bank.architecture.auth.dtos.FeatureDto;
 import com.github.dperezcabrera.bank.architecture.auth.services.FeatureService;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,7 +20,7 @@ public class FeatureController {
 
     @GetMapping("/all")
     @PreAuthorize("@roleChecker.isAdmin()")
-    public ResponseEntity<List<String>> getAll() {
+    public ResponseEntity<List<FeatureDto>> getAll() {
         return ResponseEntity.ok(featureService.getAllFeatures());
     }
 
@@ -32,27 +30,10 @@ public class FeatureController {
         return ResponseEntity.ok(featureService.getActiveFeatures());
     }
 
-    @PutMapping("/active")
+    @PutMapping("/reset")
     @PreAuthorize("@roleChecker.isAdmin()")
-    public ResponseEntity<Void> actives(@RequestBody FeaturesDto features) {
-        featureService.setActiveFeatures(features.getFeatures());
-        return ResponseEntity.ok().body(null);
-    }
-
-    @PutMapping("/active-all")
-    @PreAuthorize("@roleChecker.isAdmin()")
-    public ResponseEntity<Void> activeAll() {
-        featureService.setActiveFeatures(featureService.getAllFeatures());
-        return ResponseEntity.ok().body(null);
-    }
-
-    @PutMapping("/deactivate")
-    @PreAuthorize("@roleChecker.isAdmin()")
-    public ResponseEntity<Void> deactivates(@RequestBody FeaturesDto features) {
-        List<String> activeFeatures = featureService.getActiveFeatures().stream()
-                .filter(f -> !features.getFeatures().contains(f))
-                .collect(Collectors.toList());
-        featureService.setActiveFeatures(activeFeatures);
+    public ResponseEntity<Void> resetFeatureCounters() {
+        featureService.resetFeatureCounters();
         return ResponseEntity.ok().body(null);
     }
 }

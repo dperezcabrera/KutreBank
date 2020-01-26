@@ -4,31 +4,28 @@ import com.github.dperezcabrera.bank.architecture.auth.dtos.CredentialsDto;
 import com.github.dperezcabrera.bank.architecture.auth.dtos.SignUpDto;
 import com.github.dperezcabrera.bank.architecture.auth.dtos.UserDto;
 import com.github.dperezcabrera.bank.architecture.auth.services.UserService;
+import com.github.dperezcabrera.bank.architecture.common.ControllerUtility;
 import com.github.dperezcabrera.bank.architecture.common.MessageDto;
 import javax.servlet.http.HttpServletRequest;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.AuditorAware;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import lombok.AllArgsConstructor;
-import org.springframework.data.domain.AuditorAware;
-import org.springframework.security.core.context.SecurityContextHolder;
-
 @Slf4j
 @RestController
 @AllArgsConstructor
 public class AuthenticationController {
-
-    private static final ResponseEntity<?> FORBIDDEN_RESPONSE = ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
 
     private final AuthenticationManager authenticationManager;
 
@@ -37,18 +34,14 @@ public class AuthenticationController {
     private final UserService userService;
 
     private final AuditorAware<String> auditorAware;
-
-    private static <T> ResponseEntity<T> forbidden() {
-        return (ResponseEntity<T>) FORBIDDEN_RESPONSE;
-    }
-
+    
     @GetMapping("/auth/login")
     public ResponseEntity<UserDto> login() {
         return auditorAware.getCurrentAuditor()
                 .map(username -> userService.getUser(username)
                 .map(ResponseEntity::ok)
-                .orElseGet(AuthenticationController::forbidden))
-                .orElseGet(AuthenticationController::forbidden);
+                .orElseGet(ControllerUtility::forbidden))
+                .orElseGet(ControllerUtility::forbidden);
     }
 
     @PostMapping("/auth/login")
@@ -60,23 +53,15 @@ public class AuthenticationController {
                 SecurityContextHolder.getContext().setAuthentication(auth);
                 sessionRegistry.registerNewSession(request.getSession().getId(), auth.getPrincipal());
                 return ResponseEntity.ok(userDto);
-            }).orElseGet(AuthenticationController::forbidden);
+            }).orElseGet(ControllerUtility::forbidden);
         } catch (BadCredentialsException ex) {
             log.error("Bad credentials error", ex);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+            return ControllerUtility.forbidden();
         }
     }
 
     @PostMapping("/auth/signup")
     public ResponseEntity<MessageDto> signUp(@RequestBody SignUpDto signUpDto) {
-        try {
-            return userService.signUp(signUpDto).toResponse();
-        } catch (IllegalArgumentException ex) {
-            log.error("No se ha podido registrar la peticion: " + signUpDto, ex);
-            return MessageDto.forbidden("No se ha podido registrar el usuario: " + ex.getMessage()).toResponse();
-        } catch (Exception ex) {
-            log.error("No se ha podido registrar la peticion: " + signUpDto, ex);
-            return MessageDto.forbidden("No se ha podido registrar el usuario").toResponse();
-        }
+        return ResponseEntity.ok(userService.signUp(signUpDto));
     }
 }

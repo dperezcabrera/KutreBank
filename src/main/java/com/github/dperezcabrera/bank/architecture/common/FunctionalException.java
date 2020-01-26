@@ -1,4 +1,4 @@
-package com.github.dperezcabrera.bank.architecture.error;
+package com.github.dperezcabrera.bank.architecture.common;
 
 public class FunctionalException extends RuntimeException {
 

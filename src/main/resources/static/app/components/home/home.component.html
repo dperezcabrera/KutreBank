@@ -1,43 +1,10 @@
 <div class="container-fluid" style="margin: 0px; padding: 0px">
-    <div style="height: 64px; background-color: #1a6ca3; margin: 0 0 15px 0; border-bottom: 1px #000 solid">
-        <div style="float: left"><img src="images/logo.png" alt="KutreBank"/></div>
-        <div style="float: right; margin-right: 20px; margin-top: 16px; background-color: #000; padding: 5px 8px">
-            <li style="display: inline;"><a href="" ng-click="ctrl.logout()" ><i class="fas fa-power-off"></i></a></li>
-        </div>
-        <div style="margin-left: 45%; color: #000; padding-top: 18px">{{ctrl.user.username}} (CC {{ctrl.user.id}}: {{ctrl.user.amount}}€)</div>
-    </div>
+    <header.component></header.component>
+    <menu.component></menu.component>
     <div ng-show="ctrl.state === 'ready'" style="color: #000">
         <div>
             <div style="background-color: #fff; margin: 30px; padding: 20px">
-                <div style="margin-bottom: 10px; border-bottom: #bbb 2px solid"><h4>Realizar transferencia</h4></div>
-                <div class="container" style="width: 100%">
-                    <form>
-                        <div class="row">
-                            <div class="col-2">
-                                <div style="margin-top: 22px">
-                                    <button style="display: inline" ng-click="ctrl.transfer()" id="submit-transfer" name="submit-transfer" type="submit" class="btn btn-primary btn-lg btn-block login-button">Enviar</button>
-                                </div>
-                            </div>
-                            <div class="col-3">
-                                CC destino
-                                <input type="number" min="1"  class="form-border-input form-control" required="" ng-model="ctrl.transferData.targetId"/>
-                            </div>
-                            <div class="col-3">
-                                Cuantía
-                                <input type="number" max="{{ctrl.user.amount}}"  class="form-border-input form-control" required="" ng-model="ctrl.transferData.amount"/>
-                            </div>
-                            <div class="col-4">
-                                Descripción
-                                <textarea cols="40" rows="4"  class="form-border-input form-control" ng-model="ctrl.transferData.description"></textarea>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-        <div>
-            <div style="background-color: #fff; margin: 30px; padding: 20px">
-                <div style="margin-bottom: 20px; border-bottom: #bbb 2px solid"><h4>Movimientos</h4></div>
+                <div style="margin-bottom: 20px; border-bottom: #98bcd4 2px solid"><h4>Movimientos</h4></div>
                 <table style="width: 100%">
                     <thead>
                         <tr style="text-align: center">
@@ -48,7 +15,7 @@
                             <th style="width: 60%; text-align: left">Descripción</th>
                         </tr>
                     </thead>
-                    <tbody style="border-top: #bbb 1px solid; margin: 5px">
+                    <tbody style="border-top: #98bcd4 1px solid; margin: 5px">
                         <tr ng-repeat="m in ctrl.movements">
                             <td style="text-align: center" title="{{m.originName}}">{{m.originId}}</td>
                             <td style="text-align: center" title="{{m.targetName}}">{{m.targetId}}</td>
@@ -61,9 +28,5 @@
             </div>
         </div>
     </div>
-    <div ng-show="ctrl.state === 'waiting'">
-        <div class="waiting-box">
-            <img src="images/loading.gif" alt="waiting..."/>
-        </div>
-    </div>
+    <waiting.component ng-show="ctrl.state === 'waiting'"></waiting.component>
 </div>

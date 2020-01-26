@@ -1,16 +1,24 @@
-body {
-    background-image: url('../images/background.jpg');
+html,
+body, 
+.main {
+    height: 100%;
 }
 
 .view-panel {
     padding-top:0px;
+    padding-bottom: 0px;
+    background-image: url('../images/background.jpg');
+
+    background-attachment: fixed;
+    background-position: center;
+    height: 100%;
 }
 
-.login-color {
+.signin-color {
     color: #1a6ca3;
 }
 
-.login-box {
+.signin-box {
     background: rgba(48,143,194,1);
     background: -moz-linear-gradient(left, rgba(48,143,194,1) 0%, rgba(168,218,245,1) 28%, rgba(48,143,194,1) 75%, rgba(26,108,163,1) 100%);
     background: -webkit-gradient(left top, right top, color-stop(0%, rgba(48,143,194,1)), color-stop(28%, rgba(168,218,245,1)), color-stop(75%, rgba(48,143,194,1)), color-stop(100%, rgba(26,108,163,1)));
@@ -22,7 +30,7 @@ body {
     padding: 35px; 
 }
 
-.login-box-background {
+.signin-box-background {
     background-color: #fff; 
     padding: 20px 40px;
     color: #1a6ca3;
@@ -37,11 +45,15 @@ body {
     border-color: rgba(48,143,194,1);
 }
 
-.login-button {
+.signin-button {
     font-weight: bolder;
 }
 
 .waiting-box {
     margin-top: 8%; 
     text-align: center;
+}
+
+.has-error {
+    border-color: red;
 }

@@ -1,0 +1,46 @@
+<div class="view-panel container-fluid">
+    <div ng-show="ctrl.state === 'ready'" class="container-fluid">
+        <div class="row">
+            <div class="col-md-6"></div>
+            <div class="col-md-5">
+                <div>
+                    <div class="signin-box" style="margin-top: 50%;">
+                        <div class="signin-box-background">
+                            <form>
+                                <div class="form-group" ng-class="{'has-error': ctrl.credentials.error}">
+                                    <label for="username" class="cols-sm-2 control-label">Nombre de usuario</label>
+                                    <div class="cols-sm-10">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <div class="form-background-label input-group-text"><i class="signin-color fa fa-user fa" aria-hidden="true"></i></div>
+                                            </div>
+                                            <input type="text" class="form-border-input form-control" name="username" id="username" required="" placeholder="Introduce tu nombre de usuario" data-ng-model="ctrl.credentials.username"/>
+                                        </div>
+                                    </div>
+                                    <span class="label label-danger" ng-if="ctrl.credentials.error">{{ctrl.credentials.error}}</span>
+                                </div>
+                                <div class="form-group" ng-class="{'has-error': ctrl.credentials.error}">
+                                    <label for="password" class="cols-sm-2 control-label">Contraseña</label>
+                                    <div class="cols-sm-10">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <div class="form-background-label input-group-text"><i class="signin-color fa fa-lock fa" aria-hidden="true"></i></div>
+                                            </div>
+                                            <input type="password" class="form-border-input form-control" name="password" id="password" required="" placeholder="Introduce la contraseña" data-ng-model="ctrl.credentials.password"/>
+                                        </div>
+                                    </div>
+                                    <span class="label label-danger" ng-if="ctrl.credentials.error">{{ctrl.credentials.error}}</span>
+                                </div>
+                                <div class="form-group" style="margin-top: 40px; padding: 0 30%;">
+                                    <button style="display: inline" ng-click="ctrl.signIn()" id="submit-signin" name="submit-signin" type="submit" class="btn btn-primary btn-lg btn-block signin-button">Entrar</button>
+                                    <button style="display: inline" ng-click="ctrl.goToSignUp()" id="submit-signin" name="submit-signin" type="submit" class="btn btn-info btn-lg btn-block signin-button">Registrar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <waiting.component ng-show="ctrl.state === 'waiting'"></waiting.component>
+</div>

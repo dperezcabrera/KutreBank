@@ -3,7 +3,7 @@ package com.github.dperezcabrera.bank.architecture.auth.services;
 import com.github.dperezcabrera.bank.architecture.auth.repositories.CodeRepository;
 import com.github.dperezcabrera.bank.architecture.auth.dtos.CodeDto;
 import com.github.dperezcabrera.bank.architecture.auth.entities.Code;
-import com.github.dperezcabrera.bank.architecture.error.FunctionalException;
+import com.github.dperezcabrera.bank.architecture.common.FunctionalException;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;

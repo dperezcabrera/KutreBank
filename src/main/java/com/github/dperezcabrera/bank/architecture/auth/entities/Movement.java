@@ -37,7 +37,7 @@ public class Movement implements Serializable {
     private LocalDateTime date;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false)
+    @JoinColumn
     private User origin;
 
     @ManyToOne(fetch = FetchType.LAZY)

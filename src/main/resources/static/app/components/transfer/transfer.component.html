@@ -1,0 +1,35 @@
+<div class="container-fluid" style="margin: 0px; padding: 0px">
+    <header.component></header.component>
+    <menu.component></menu.component>
+    <div ng-show="ctrl.state === 'ready'" style="color: #000">
+        <div>
+            <div style="background-color: #fff; margin: 30px; padding: 20px">
+                <div style="margin-bottom: 10px; border-bottom: #98bcd4 2px solid"><h4>Realizar transferencia</h4></div>
+                <div class="container" style="width: 100%">
+                    <form>
+                        <div class="row">
+                            <div class="col-2">
+                                <div style="margin-top: 22px">
+                                    <button style="display: inline" ng-click="ctrl.transfer()" id="submit-transfer" name="submit-transfer" type="submit" class="btn btn-primary btn-lg btn-block login-button">Enviar</button>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                CC destino
+                                <input type="number" min="1"  class="form-border-input form-control" required="" ng-model="ctrl.transferData.targetId"/>
+                            </div>
+                            <div class="col-3">
+                                Cuantía
+                                <input type="number" max="{{ctrl.user.amount}}"  class="form-border-input form-control" required="" ng-model="ctrl.transferData.amount"/>
+                            </div>
+                            <div class="col-4">
+                                Descripción
+                                <textarea cols="40" rows="4"  class="form-border-input form-control" ng-model="ctrl.transferData.description"></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <waiting.component ng-show="ctrl.state === 'waiting'"></waiting.component>
+</div>

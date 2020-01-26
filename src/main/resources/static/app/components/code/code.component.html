@@ -1,0 +1,8 @@
+<div class="container-fluid" style="margin: 0px; padding: 0px">
+    <header.component></header.component>
+    <menu.component></menu.component>
+    <div ng-show="ctrl.state === 'ready'" style="color: #000">
+        <h1>code</h1>
+    </div>
+    <waiting.component ng-show="ctrl.state === 'waiting'"></waiting.component>
+</div>
